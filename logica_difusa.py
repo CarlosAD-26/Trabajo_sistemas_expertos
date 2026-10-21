@@ -6,9 +6,10 @@ Script de lógica difusa
 
 import numpy as np
 
+#Rejilla de valores
 REJILLA = np.linspace(0, 100, 1001)
 
-
+# ======================== Funciones de pertenencia =========================
 def pertenencia_triangular(x, a, b, c):
     """Triángulo con vértices a <= b <= c, pico en b (μ=1). Acepta escalares o arrays."""
     x = np.asarray(x, dtype=float)
@@ -38,7 +39,6 @@ def desvio_alto(d):  return pertenencia_trapezoidal(d, 60, 80, 100, 100)
 
 
 # ========================= Metodo de Mandani =========================
-
 def metodo_mandani(ocupacion, rejilla=REJILLA):
     """
     Inferencia Mamdani:
