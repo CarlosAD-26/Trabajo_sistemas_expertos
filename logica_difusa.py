@@ -76,14 +76,13 @@ def decidir_desvio(ocupacion, umbral=80):
 
 
 #Prueba funcion difusa
-"""
+
 if __name__ == "__main__":
-    for o in [75, 80, 81]:
+    for o in [15,75, 80, 81,95]:
         d, info = metodo_mandani(o)
         w = tuple(round(v, 2) for v in info["activaciones"])
         print(f"ocupación={o:>3}% -> desvío d*={d:6.2f}%  "
               f"(baja, media, alta)={w}  desviar>80: {decidir_desvio(o)}")
-"""
 
 """
     Resultado: 
