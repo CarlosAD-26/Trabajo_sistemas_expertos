@@ -41,8 +41,6 @@ reglas = [
         },
         "conclusion": "autorizar_clasificacion"
     },
-
-   
     {
         "nombre": "R7",
         "condiciones": {
@@ -51,5 +49,4 @@ reglas = [
         },
         "conclusion": "retener_temporalmente"
     }
-
 ]
