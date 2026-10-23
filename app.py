@@ -34,7 +34,7 @@ st.markdown('<div class="subtitle">Sistema de apoyo a la decisión para incidenc
 
 # Creamos dos pestañas para separar el contenido principal.
 tab_incidencias, tab_ocupacion = st.tabs([
-    "📋 Incidencias de paquetes", "📊 Ocupación y desvío"
+    "Incidencias de paquetes", "Ocupación y desvío"
 ])
 
 # --------------------- ZONA 1: INCIDENCIAS ---------------------
