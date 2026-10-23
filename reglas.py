@@ -42,9 +42,14 @@ reglas = [
         "conclusion": "autorizar_clasificacion"
     },
 
+   
     {
         "nombre": "R7",
-        "condiciones": {"embalaje_danado"},
-        "conclusion": "enviar_revision"
+        "condiciones": {
+            "documentacion_incompleta",
+            "destino_no_identificado"
+        },
+        "conclusion": "retener_temporalmente"
     }
+
 ]
