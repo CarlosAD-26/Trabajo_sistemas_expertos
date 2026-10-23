@@ -67,7 +67,6 @@ with tab_incidencias:
 
     # El formulario reúne la referencia del paquete y las incidencias observadas.
     with st.form("formulario_incidencias"):
-        referencia = st.text_input("Código o referencia del paquete (opcional)", placeholder="Ej. P-104")
         st.write("**Incidencias observadas**")
         
         izquierda, derecha = st.columns(2)
@@ -92,7 +91,6 @@ with tab_incidencias:
         finales, traza = encadenar_hacia_adelante(iniciales, reglas)
         # Guardamos el resultado en la sesión para que siga visible al actualizarse la página.
         st.session_state["resultado_incidencias"] = {
-            "referencia": referencia.strip(),
             "iniciales": iniciales,
             "conclusiones": finales - iniciales,
             "traza": traza,
@@ -107,8 +105,6 @@ with tab_incidencias:
 
         st.divider()
         st.subheader("Resultado de la evaluación")
-        if resultado["referencia"]:
-            st.caption("Paquete: " + resultado["referencia"])
         c1, c2, c3 = st.columns(3)
         c1.metric("Hechos iniciales", len(iniciales))
         c2.metric("Conclusiones nuevas", len(conclusiones))
