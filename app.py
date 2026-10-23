@@ -167,83 +167,73 @@ with tab_ocupacion:
     baja, media, alta = informacion["activaciones"]
     decision = decidir_desvio(ocupacion)
 
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Ocupación actual", f"{ocupacion}%")
-    c2.metric("Salida difusa (centroide)", f"{desvio_final:.1f}%")
-    c3.metric("Regla rígida (> 80%)", "Desviar" if decision else "No desviar")
+    col_datos, col_graficos = st.columns([1, 1.25], gap="large")
 
-    # Indicamos si se ha superado el límite fijo del 80 %.
-    if decision:
-        st.success("La regla rígida se activa porque la ocupación supera el 80 %.")
-    else:
-        st.warning("La regla rígida no se activa porque la ocupación es del 80 % o menos.")
+    with col_datos:
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Ocupación actual", f"{ocupacion}%")
+        c2.metric("Salida difusa (centroide)", f"{desvio_final:.1f}%")
+        c3.metric("Regla rígida (> 80%)", "Desviar" if decision else "No desviar")
 
-    st.markdown("#### Grados de pertenencia y reglas activadas")
-    st.caption("Los grados están entre 0 y 1 y no representan el porcentaje final de desvío.")
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Ocupación baja", f"{baja:.2f}")
-    c2.metric("Ocupación media", f"{media:.2f}")
-    c3.metric("Ocupación alta", f"{alta:.2f}")
+        # Indicamos si se ha superado el límite fijo del 80 %.
+        if decision:
+            st.success("La regla rígida se activa porque la ocupación supera el 80 %.")
+        else:
+            st.warning("La regla rígida no se activa porque la ocupación es del 80 % o menos.")
 
-    # Enseñamos cuánto se activa cada regla difusa; el valor siempre se dibuja entre 0 y 1.
-    for codigo, descripcion, valor in [
-        ("D1", "Ocupación baja → desvío bajo", baja),
-        ("D2", "Ocupación media → desvío medio", media),
-        ("D3", "Ocupación alta → desvío alto", alta),
-    ]:
-        st.write(f"**{codigo}: {descripcion}**")
-        st.caption(f"Grado de activación: {valor:.3f}")
+        st.markdown("#### Grados de pertenencia y reglas activadas")
+        st.caption("Los grados están entre 0 y 1 y no representan el porcentaje final de desvío.")
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Ocupación baja", f"{baja:.2f}")
+        c2.metric("Ocupación media", f"{media:.2f}")
+        c3.metric("Ocupación alta", f"{alta:.2f}")
 
-    st.divider()
+        with st.expander("Cómo se calcula el resultado"):
+            st.write("1. **Fuzzificación:** se calcula la pertenencia a baja, media y alta.")
+            st.write("2. **Implicación:** cada regla recorta su conjunto de salida usando el mínimo.")
+            st.write("3. **Agregación:** se combinan las salidas usando el máximo.")
+            st.write("4. **Desdifusificación:** se calcula el centroide para obtener un único valor.")
+        st.caption("La salida difusa es un resultado matemático, no una probabilidad. La regla rígida y la difusa son criterios distintos.")
 
-    # Dibujamos las gráficas una al lado de la otra
-    col_graf1, col_graf2 = st.columns(2)
+    with col_graficos:
+        col_graf1, col_graf2 = st.columns(2)
 
-    with col_graf1:
-        st.markdown("#### Funciones de pertenencia (Entrada)")
-        # Cada curva representa cuándo consideramos la ocupación baja, media o alta.
-        fig1, ax1 = plt.subplots()
-        ax1.plot(REJILLA, ocupacion_baja(REJILLA), label="Baja")
-        ax1.plot(REJILLA, ocupacion_media(REJILLA), label="Media")
-        ax1.plot(REJILLA, ocupacion_alta(REJILLA), label="Alta")
+        with col_graf1:
+            st.markdown("#### Funciones de pertenencia (Entrada)")
+            # Cada curva representa cuándo consideramos la ocupación baja, media o alta.
+            fig1, ax1 = plt.subplots(figsize=(4.5, 3))
+            ax1.plot(REJILLA, ocupacion_baja(REJILLA), label="Baja")
+            ax1.plot(REJILLA, ocupacion_media(REJILLA), label="Media")
+            ax1.plot(REJILLA, ocupacion_alta(REJILLA), label="Alta")
 
-        # Esta línea señala el porcentaje que hemos elegido en el deslizador.
-        ax1.axvline(ocupacion, linestyle="--", color="gray", label=f"Ocupación = {ocupacion}%")
-        ax1.set_xlabel("Ocupación (%)")
-        ax1.set_ylabel("Grado de pertenencia")
-        ax1.set_xlim(0, 100)
-        ax1.set_ylim(0, 1.05)
-        ax1.grid(True, alpha=0.25)
-        ax1.legend(loc="upper right")
-        fig1.tight_layout()
-        st.pyplot(fig1)
+            # Esta línea señala el porcentaje que hemos elegido en el deslizador.
+            ax1.axvline(ocupacion, linestyle="--", color="gray", label=f"Ocupación = {ocupacion}%")
+            ax1.set_xlabel("Ocupación (%)")
+            ax1.set_ylabel("Grado de pertenencia")
+            ax1.set_xlim(0, 100)
+            ax1.set_ylim(0, 1.05)
+            ax1.grid(True, alpha=0.25)
+            ax1.legend(loc="upper right")
+            fig1.tight_layout()
+            st.pyplot(fig1, use_container_width=False)
 
-        # Cerramos la figura para liberar recursos después de mostrarla.
-        plt.close(fig1)
+            # Cerramos la figura para liberar recursos después de mostrarla.
+            plt.close(fig1)
 
+        with col_graf2:
+            st.markdown("#### Salida agregada y centroide")
+            # La zona naranja es la salida combinada; la línea roja marca el resultado final.
+            fig2, ax2 = plt.subplots(figsize=(4.5, 3))
+            ax2.plot(REJILLA, informacion["mu_agg"], label="Salida agregada", color="orange")
+            ax2.fill_between(REJILLA, informacion["mu_agg"], alpha=0.2, color="orange")
+            ax2.axvline(desvio_final, linestyle="--", color="red", label=f"Centroide = {desvio_final:.1f}%")
+            ax2.set_xlabel("Nivel de desvío (%)")
+            ax2.set_ylabel("Grado de pertenencia")
+            ax2.set_xlim(0, 100)
+            ax2.set_ylim(0, 1.05)
+            ax2.grid(True, alpha=0.25)
+            ax2.legend(loc="upper right")
+            fig2.tight_layout()
+            st.pyplot(fig2, use_container_width=False)
 
-    #Colunmna del Centroide
-    with col_graf2:
-        st.markdown("#### Salida agregada y centroide")
-        # La zona naranja es la salida combinada; la línea roja marca el resultado final.
-        fig2, ax2 = plt.subplots()
-        ax2.plot(REJILLA, informacion["mu_agg"], label="Salida agregada", color="orange")
-        ax2.fill_between(REJILLA, informacion["mu_agg"], alpha=0.2, color="orange")
-        ax2.axvline(desvio_final, linestyle="--", color="red", label=f"Centroide = {desvio_final:.1f}%")
-        ax2.set_xlabel("Nivel de desvío (%)")
-        ax2.set_ylabel("Grado de pertenencia")
-        ax2.set_xlim(0, 100)
-        ax2.set_ylim(0, 1.05)
-        ax2.grid(True, alpha=0.25)
-        ax2.legend(loc="upper right")
-        fig2.tight_layout()
-        st.pyplot(fig2)
-
-        plt.close(fig2)
-
-    with st.expander("Cómo se calcula el resultado"):
-        st.write("1. **Fuzzificación:** se calcula la pertenencia a baja, media y alta.")
-        st.write("2. **Implicación:** cada regla recorta su conjunto de salida usando el mínimo.")
-        st.write("3. **Agregación:** se combinan las salidas usando el máximo.")
-        st.write("4. **Desdifusificación:** se calcula el centroide para obtener un único valor.")
-    st.caption("La salida difusa es un resultado matemático, no una probabilidad. La regla rígida y la difusa son criterios distintos.")
+            plt.close(fig2)
